@@ -18,3 +18,18 @@ users
     updatedAt: timestamp
 }
 ```
+
+# Orders Collection
+
+```text
+orders
+{
+    uid: string,
+    planId: string (BASIC/PREMIUM)
+    amount: number
+    status: string (PENDING/SUCCESS/FAILED)
+    razorpayOrderId: string
+    razorpayPaymentId: string
+    createdAt: timestamp
+}
+```
