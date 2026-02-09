@@ -6,12 +6,9 @@ admin.initializeApp({
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     privateKey: process.env.FIREBASE_PRIVATE_KEY,
   }),
-
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 const auth = admin.auth();
-const bucket = admin.storage().bucket();
 const db = admin.firestore();
 
-module.exports = { auth, bucket, admin, db };
+module.exports = { auth, admin, db };

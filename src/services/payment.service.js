@@ -1,8 +1,12 @@
 const { razorpayInstance } = require("../configs/razorpay.config");
 const { PLANS } = require("../configs/plans.config");
 const OrdersDB = require("../db/order.db");
+const UsersDB = require("../db/user.db");
+
 const AppError = require("../errors/AppError");
 const crypto = require("crypto");
+
+const ReferalService = require("./referal.service");
 
 const createOrder = async ({ uid, planId }) => {
   const amount = PLANS[planId].price;
@@ -32,7 +36,6 @@ const verifyOrder = async ({
   razorpayPaymentId,
   razorpaySignature,
 }) => {
-  console.log(uid, razorpayOrderId, razorpayPaymentId, razorpaySignature);
   const order = await OrdersDB.getOrderByRazorpayOrderId(razorpayOrderId);
 
   if (!order) throw new AppError("Order not found", 404);
@@ -50,6 +53,16 @@ const verifyOrder = async ({
     razorpayPaymentId,
     status: "SUCCESS",
   });
+
+  const user = await UsersDB.getUser(uid);
+
+  await UsersDB.updateUser(uid, {
+    planId: order.planId,
+    planStatus: "ACTIVE",
+    planExpiryDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  });
+
+  await ReferalService.referralService(user.referredBy, order.id);
 
   return { orderId: order.id, razorpayOrderId: order.razorpayOrderId };
 };

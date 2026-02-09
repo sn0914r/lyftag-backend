@@ -33,3 +33,19 @@ orders
     createdAt: timestamp
 }
 ```
+
+# ReferralTransaction
+
+```text
+referralTransactions
+{
+referrerUid: string
+referredUid: string
+
+    orderId: ObjectId
+    rewardAmount: number
+
+    createdAt: timestamp
+
+}
+```

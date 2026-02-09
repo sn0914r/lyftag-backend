@@ -16,7 +16,6 @@ const createOrder = async ({
     razorpayOrderId,
     status,
     createdAt: Date.now(),
-    updatedAt: Date.now(),
   });
 
   return orderDocument.id;

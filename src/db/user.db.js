@@ -1,4 +1,5 @@
 const { db } = require("../configs/firebase.config");
+const AppError = require("../errors/AppError");
 
 const COLLECTION_NAME = "users";
 
@@ -10,7 +11,6 @@ const addUser = async ({
   referralCode,
   referredBy,
 }) => {
-
   const timestamp = Date.now();
   const userDocument = {
     uid,
@@ -37,4 +37,19 @@ const getUser = async (uid) => {
   return userDocument.data();
 };
 
-module.exports = { addUser, getUser };
+const getUserByReferredByCode = async (referredBy) => {
+  const userDocument = await db
+    .collection(COLLECTION_NAME)
+    .where("referralCode", "==", referredBy)
+    .get();
+  if (userDocument.empty) throw new AppError("User not found", 404);
+
+  const doc = userDocument.docs[0];
+  return { uid: doc.id, ...doc.data() };
+};
+
+const updateUser = async (uid, data) => {
+  return db.collection(COLLECTION_NAME).doc(uid).update(data);
+};
+
+module.exports = { addUser, getUser, getUserByReferredByCode, updateUser };
