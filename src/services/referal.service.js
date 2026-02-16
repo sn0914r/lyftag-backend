@@ -16,7 +16,7 @@ const referralService = async (referredBy, orderId) => {
 
   await ReferralTransactionsDB.addTransaction({
     referrerUid: user.uid,
-    referredUid: referredBy,
+    referredBy,
     orderId: orderId,
     rewardAmount: 50,
   });

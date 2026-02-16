@@ -3,13 +3,13 @@ const { db } = require("../configs/firebase.config");
 const COLLECTION_NAME = "refferalTransactions";
 
 const addTransaction = async ({
-  referrerUid,
+  refferedBy,
   referredUid,
   orderId,
   rewardAmount,
 }) => {
   const transactionDocument = await db.collection(COLLECTION_NAME).add({
-    referrerUid,
+    refferedBy,
     referredUid,
     orderId,
     rewardAmount,
