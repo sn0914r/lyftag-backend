@@ -49,3 +49,20 @@ referredUid: string
 
 }
 ```
+
+# UserProfiles
+
+```text
+userProfiles
+{
+   uid: string,                 // reference to users.uid
+
+   ownerName: string,
+   vehicleRegistrationNumber: string,
+   bloodGroup: string,
+   isDonor: boolean
+
+   createdAt,
+   updatedAt
+}
+```

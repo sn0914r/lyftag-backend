@@ -34,7 +34,10 @@ const addUser = async ({
 
 const getUser = async (uid) => {
   const userDocument = await db.collection(COLLECTION_NAME).doc(uid).get();
-  return userDocument.data();
+  if (userDocument.exists) {
+    return { id: userDocument.id, ...userDocument.data() };
+  }
+  return false;
 };
 
 const getUserByReferredByCode = async (referredBy) => {
