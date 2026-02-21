@@ -1,26 +1,32 @@
-const { db } = require("../configs/firebase.config");
-const AppError = require("../errors/AppError");
+const { db } = require("../../configs/firebase.config");
+const AppError = require("../../errors/AppError");
 
 const COLLECTION_NAME = "orders";
-const createOrder = async ({
-  uid,
-  planId,
-  amount,
-  razorpayOrderId,
-  status,
-}) => {
+
+/**
+ * @desc creates order
+ *
+ * @returns {Promise<string>}
+ */
+const createOrder = async ({ uid, plan, amount, razorpayOrderId, status }) => {
   const orderDocument = await db.collection(COLLECTION_NAME).add({
     uid,
-    planId,
+    plan,
     amount,
     razorpayOrderId,
     status,
+
     createdAt: Date.now(),
   });
 
   return orderDocument.id;
 };
 
+/**
+ * @desc gets order by razorpayOrderId
+ *
+ * @returns {Promise<object>} Order details
+ */
 const getOrderByRazorpayOrderId = async (razorpayOrderId) => {
   const orderDocument = await db
     .collection(COLLECTION_NAME)
@@ -33,6 +39,11 @@ const getOrderByRazorpayOrderId = async (razorpayOrderId) => {
   return { id: doc.id, ...doc.data() };
 };
 
+/**
+ * @desc updates order
+ *
+ * @returns {Promise<void>}
+ */
 const updateOrder = async (razorpayOrderId, { razorpayPaymentId, status }) => {
   const orderDocument = await db
     .collection(COLLECTION_NAME)
@@ -40,10 +51,13 @@ const updateOrder = async (razorpayOrderId, { razorpayPaymentId, status }) => {
     .get();
   if (orderDocument.empty) throw new AppError("Order not found", 404);
 
-  return orderDocument.docs[0].ref.update({
+  await orderDocument.docs[0].ref.update({
     razorpayPaymentId,
     status,
     updatedAt: Date.now(),
   });
+
+  return;
 };
+
 module.exports = { createOrder, getOrderByRazorpayOrderId, updateOrder };

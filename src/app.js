@@ -1,20 +1,23 @@
 const express = require("express");
 const app = express();
+
 const cors = require("cors");
 
-const authRoutes = require("./routes/auth.routes");
-const paymentRoutes = require("./routes/payment.routes");
-const userProfile = require("./routes/userProfile.routes");
+const authRoutes = require("./modules/auth/auth.routes");
+const paymentRoutes = require("./modules/payment-orders/payment-order.routes");
+
+const vehicleRoutes = require("./modules/vehicle-details/vehicle-details.routes");
 
 const errorHandler = require("./middlewares/error.middleware");
 
 app.use(express.json());
 app.use(cors());
 
-app.use(authRoutes);
-app.use(paymentRoutes);
-app.use(userProfile);
+app.use("/auth", authRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/vehicle-details", vehicleRoutes);
 
 app.get("/health", (req, res) => res.status(200).send("OK"));
+
 app.use(errorHandler);
 module.exports = app;

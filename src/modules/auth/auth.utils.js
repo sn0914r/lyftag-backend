@@ -1,3 +1,6 @@
+/**
+ * @desc generates a random referral code
+ */
 const generateReferralCode = (length = 6) => {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

@@ -1,3 +1,5 @@
 node_modules
 .env
 log.md
+.DS_Store
+docs

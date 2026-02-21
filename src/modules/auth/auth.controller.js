@@ -1,5 +1,8 @@
-const AuthServices = require("../services/auth.service");
+const AuthServices = require("./auth.service");
 
+/**
+ * @desc syncs user details from firebase to our database
+ */
 const syncUserController = async (req, res) => {
   const {
     uid,

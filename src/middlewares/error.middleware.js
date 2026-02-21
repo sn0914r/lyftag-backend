@@ -2,9 +2,9 @@ const AppError = require("../errors/AppError");
 
 const errorHandler = (err, _req, res, _next) => {
   const isProduction = process.env.NODE_ENV === "production";
-  const status = err.status || 500;
+  const status = err.statusCode || err.status || 500;
 
-  console.log(err)
+  console.log(err);
 
   if (!isProduction) {
     return res.status(status).json({

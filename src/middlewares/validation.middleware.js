@@ -1,7 +1,6 @@
 const AppError = require("../errors/AppError");
 
 const validateBody = (schema) => (req, res, next) => {
-  console.log(req.body)
   const { error, value } = schema.validate(req.body);
 
   if (error) {

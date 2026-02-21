@@ -10,13 +10,22 @@ users
     referralCode: string
     referredBy: string
 
+    createdAt: timestamp
+    updatedAt: timestamp
+}
+```
+
+# Referrals Collection
+
+```text
+
+uid: string
     totalReferralEarnings: number
     totalReferralsCount: number
     availableReferralBalanceAmount: number
 
     createdAt: timestamp
     updatedAt: timestamp
-}
 ```
 
 # Orders Collection
