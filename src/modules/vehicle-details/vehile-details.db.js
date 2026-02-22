@@ -1,17 +1,18 @@
 const { db } = require("../../configs/firebase.config");
 
-const COLLECTION_NAME = "userProfiles";
+const COLLECTION_NAME = "vehicleDetails";
 
 /**
  * @desc adds vehicle info
  *
  * @returns {Promise<void>}
  */
-const addVehicleInfo = async ({ uid, vehicleDetails }) => {
+const addVehicleInfo = async ({ uid, vehicleDetails, qrId }) => {
   const timestamp = Date.now();
 
   const userProfileDoc = {
     ...vehicleDetails,
+    qrId,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -45,4 +46,23 @@ const updateUserProfile = async ({ uid, updates }) => {
   });
 };
 
-module.exports = { addVehicleInfo, getVehicleInfo, updateUserProfile };
+/**
+ * @desc gets vehicle info by QR Id
+ *
+ * @return {Promise<object>} vehicle details
+ */
+const getVehicleInfoByQRId = async (qrId) => {
+  const doc = await db
+    .collection(COLLECTION_NAME)
+    .where("qrId", "==", qrId)
+    .get();
+  if (doc.empty) return null;
+  return { id: doc.docs[0].id, ...doc.docs[0].data() };
+};
+
+module.exports = {
+  addVehicleInfo,
+  getVehicleInfo,
+  updateUserProfile,
+  getVehicleInfoByQRId,
+};

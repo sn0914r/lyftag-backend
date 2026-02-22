@@ -1,9 +1,9 @@
-const userProfileDB = require("./vehile-details.db");
-const userDB = require("../auth/auth.db");
 const AppError = require("../../errors/AppError");
 
 const VehicleDB = require("./vehile-details.db");
 const AuthDB = require("../auth/auth.db");
+
+const { nanoid } = require("nanoid");
 
 /**
  * @desc adds vehicle info
@@ -14,9 +14,12 @@ const AuthDB = require("../auth/auth.db");
  * @returns {Promise<object>} vehicle details
  */
 const addVehicleInfo = async ({ uid, userDetails }) => {
+  const qrId = nanoid(10);
+
   await VehicleDB.addVehicleInfo({
     uid,
     vehicleDetails: userDetails,
+    qrId,
   });
 
   const vehicleDetails = await VehicleDB.getVehicleInfo(uid);
