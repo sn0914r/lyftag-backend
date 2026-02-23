@@ -4,7 +4,7 @@ const COLLECTION_NAME = "referralDetails";
 /**
  * @desc updates user's referal Details
  */
-const manageReferralDetails = async ({ uid }) => {
+const manageReferralDetails = async ({ referredBy }) => {
   const timestamp = Date.now();
 
   const document = {
@@ -16,15 +16,18 @@ const manageReferralDetails = async ({ uid }) => {
     updatedAt: timestamp,
   };
 
-  return db.collection(COLLECTION_NAME).doc(uid).set(document, { merge: true });
+  return db
+    .collection(COLLECTION_NAME)
+    .doc(referredBy)
+    .set(document, { merge: true });
 };
 
 /**
  * @desc gets a specific user's referral details
  */
-const getReferralDetails = async (uid) => {
-  const snapshot = db.collection(COLLECTION_NAME).doc(uid).get();
-  return snapshot.exists ? snapshot.data() : null;
+const getReferralDetails = async (referredBy) => {
+  const snapshot = await db.collection(COLLECTION_NAME).doc(referredBy).get();
+  return snapshot.exists ? snapshot.data() : {};
 };
 
 module.exports = { manageReferralDetails, getReferralDetails };

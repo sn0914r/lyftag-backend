@@ -1,4 +1,4 @@
-const UsersDB = require("../auth/auth.db");
+const AuthDB = require("../auth/auth.db");
 const ReferralTransactionsDB = require("./referralTransactions.db");
 const ReferralDetailsDB = require("./referralDetails.db");
 const AppError = require("../../errors/AppError");
@@ -26,10 +26,33 @@ const referralService = async ({ referredBy, orderId, userId }) => {
   });
 
   await ReferralDetailsDB.manageReferralDetails({
-    uid: referredBy,
+    referredBy,
   });
 
   return transactionId;
 };
 
-module.exports = { referralService };
+/**
+ * @desc gets referral data by user uid
+ */
+const getReferralInfoService = async (uid) => {
+  const user = await AuthDB.getUser(uid);
+  if (!user) throw new AppError("User not found", 404);
+  console.log(user, "user");
+  const referralCode = user.referralCode;
+  console.log("referralCode", referralCode);
+  if (!referralCode) return { referralDetails: {}, referralTransactions: [] };
+
+  const referralDetails =
+    await ReferralDetailsDB.getReferralDetails(referralCode);
+  const referralTransactions =
+    await ReferralTransactionsDB.getTransactions(referralCode);
+
+  // if (!referralDetails) throw new AppError("Referral details not found", 404);
+  // if (!referralTransactions)
+  //   throw new AppError("Referral transactions not found", 404);
+
+  return { referralDetails, referralTransactions };
+};
+
+module.exports = { referralService, getReferralInfoService };
