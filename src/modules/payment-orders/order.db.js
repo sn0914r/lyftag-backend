@@ -6,20 +6,26 @@ const COLLECTION_NAME = "orders";
 /**
  * @desc creates order
  *
- * @returns {Promise<string>}
+ * @returns {Promise<void>}
  */
-const createOrder = async ({ uid, plan, amount, razorpayOrderId, status }) => {
-  const orderDocument = await db.collection(COLLECTION_NAME).add({
+const createOrder = async ({
+  uid,
+  plan,
+  amount,
+  paymentOrderId,
+  cfOrderId,
+}) => {
+  await db.collection(COLLECTION_NAME).doc(paymentOrderId).set({
     uid,
     plan,
     amount,
-    razorpayOrderId,
-    status,
-
+    paymentOrderId,
+    status: "PENDING",
+    cfOrderId,
     createdAt: Date.now(),
   });
 
-  return orderDocument.id;
+  return;
 };
 
 /**
@@ -27,16 +33,12 @@ const createOrder = async ({ uid, plan, amount, razorpayOrderId, status }) => {
  *
  * @returns {Promise<object>} Order details
  */
-const getOrderByRazorpayOrderId = async (razorpayOrderId) => {
-  const orderDocument = await db
-    .collection(COLLECTION_NAME)
-    .where("razorpayOrderId", "==", razorpayOrderId)
-    .get();
+const getOrderByRazorpayOrderId = async (orderId) => {
+  const orderDocument = await db.collection(COLLECTION_NAME).doc(orderId).get();
 
-  if (orderDocument.empty) throw new AppError("Order not found", 404);
+  if (!orderDocument.exists) throw new AppError("Order not found", 404);
 
-  const doc = orderDocument.docs[0];
-  return { id: doc.id, ...doc.data() };
+  return { id: orderDocument.id, ...orderDocument.data() };
 };
 
 /**
@@ -44,15 +46,11 @@ const getOrderByRazorpayOrderId = async (razorpayOrderId) => {
  *
  * @returns {Promise<void>}
  */
-const updateOrder = async (razorpayOrderId, { razorpayPaymentId, status }) => {
-  const orderDocument = await db
-    .collection(COLLECTION_NAME)
-    .where("razorpayOrderId", "==", razorpayOrderId)
-    .get();
-  if (orderDocument.empty) throw new AppError("Order not found", 404);
+const updateOrder = async (orderId, { status }) => {
+  const orderDocument = await db.collection(COLLECTION_NAME).doc(orderId).get();
+  if (!orderDocument.exists) throw new AppError("Order not found", 404);
 
-  await orderDocument.docs[0].ref.update({
-    razorpayPaymentId,
+  await orderDocument.ref.update({
     status,
     updatedAt: Date.now(),
   });

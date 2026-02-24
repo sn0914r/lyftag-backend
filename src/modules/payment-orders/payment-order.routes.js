@@ -13,9 +13,14 @@ router.post(
 );
 router.post(
   "/verify-order",
-  verifyAuth,
-  validateBody(PaymentSchema.PaymentVerificationDetailsSchema),
+  // verifyAuth,
+  // validateBody(PaymentSchema.PaymentVerificationDetailsSchema),
   PaymentController.verifyOrderController,
 );
+// router.post(
+//   "/webhoook",
+//   // verifyAuth,
+//   PaymentController.verifyPaymentWebHook,
+// );
 
 module.exports = router;

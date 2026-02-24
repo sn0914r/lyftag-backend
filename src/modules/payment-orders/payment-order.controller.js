@@ -22,27 +22,37 @@ const createOrderController = async (req, res) => {
 
 /**
  * @desc verifies payments and confirms order
- * 
+ *
  * Preconditions:
  *  - request is authenticated
  *  - req.user.uid exists
  *  - req.body contains valid razorpayOrderId, razorpayPaymentId, razorpaySignature
- * 
+ *
  * @route /payments/verify-order
  * @access Private
  */
 const verifyOrderController = async (req, res) => {
-  const { uid } = req.user;
-  const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+  const signature = req.headers["x-webhook-signature"];
+  const timestamp = req.headers["x-webhook-timestamp"];
+  const {
+    data: {
+      order: { order_id },
+      payment: { payment_status },
+    },
+  } = req.body;
 
   const order = await PaymentService.verifyOrder({
-    uid,
-    razorpayOrderId,
-    razorpayPaymentId,
-    razorpaySignature,
+    order_id,
+    signature,
+    timestamp,
+    payment_status,
+    rawBody: req.rawBody,
   });
 
   res.status(200).json(order);
 };
 
-module.exports = { createOrderController, verifyOrderController };
+module.exports = {
+  createOrderController,
+  verifyOrderController,
+};

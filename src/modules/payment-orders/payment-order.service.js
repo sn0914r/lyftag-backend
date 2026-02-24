@@ -6,6 +6,7 @@ const { PLANS } = require("../../configs/plans.config");
 const AuthDB = require("../auth/auth.db");
 const OrdersDB = require("./order.db");
 const ReferralService = require("../referrals/referral.service");
+const { nanoid } = require("nanoid");
 
 /**
  * @desc create orders
@@ -19,23 +20,70 @@ const ReferralService = require("../referrals/referral.service");
 const createOrder = async ({ uid, plan }) => {
   const amount = PLANS[plan].price;
 
-  const OPTIONS = {
-    amount: amount * 100,
-    currency: "INR",
-    receipt: `order_rcptid_${Date.now()}`,
+  // const OPTIONS = {
+  //   amount: amount * 100,
+  //   currency: "INR",
+  //   receipt: `order_rcptid_${Date.now()}`,
+  // };
+
+  // const order = await razorpayInstance.orders.create(OPTIONS);
+
+  // const orderId = await OrdersDB.createOrder({
+  //   uid,
+  //   plan,
+  //   amount,
+  //   razorpayOrderId: order.id,
+  //   status: "PENDING",
+  // });
+
+  const baseUrl =
+    process.env.CASHFREE_ENV === "production"
+      ? "https://api.cashfree.com"
+      : "https://sandbox.cashfree.com";
+
+  const headers = {
+    "Content-Type": "application/json",
+    "x-client-id": process.env.CASHFREE_APP_ID,
+    "x-client-secret": process.env.CASHFREE_SECRET_KEY,
+    "x-api-version": "2022-09-01",
   };
 
-  const order = await razorpayInstance.orders.create(OPTIONS);
+  const body = JSON.stringify({
+    order_id: `ORD_${nanoid(12)}`,
+    order_amount: amount,
+    order_currency: "INR",
+    customer_details: {
+      customer_id: uid,
+      customer_email: "reddysivananda82@gmail.com",
+      customer_phone: "9876543210",
+    },
+  });
 
-  const orderId = await OrdersDB.createOrder({
+  const response = await fetch(`${baseUrl}/pg/orders`, {
+    method: "POST",
+    headers,
+    body,
+  });
+  const data = await response.json();
+  console.log(data);
+  if (!response.ok) {
+    throw new AppError("Failed to create order", 500);
+  }
+
+  await OrdersDB.createOrder({
     uid,
     plan,
     amount,
-    razorpayOrderId: order.id,
-    status: "PENDING",
+    paymentOrderId: data.order_id,
+    cfOrderId: data.cf_order_id,
   });
 
-  return { orderId, amount: order.amount / 100, razorpayOrderId: order.id };
+  return {
+    orderId: data.cf_order_id,
+    amount: data.order_amount,
+    paymentOrderId: data.order_id,
+    paymentSessionId: data.payment_session_id,
+  };
 };
 
 /**
@@ -49,27 +97,32 @@ const createOrder = async ({ uid, plan }) => {
  * @returns {<Promise { orderId: string, razorpayOrderId: string}>}
  */
 const verifyOrder = async ({
-  uid,
-  razorpayOrderId,
-  razorpayPaymentId,
-  razorpaySignature,
+  order_id,
+  signature,
+  timestamp,
+  payment_status,
+  rawBody,
 }) => {
-  const order = await OrdersDB.getOrderByRazorpayOrderId(razorpayOrderId);
+  const order = await OrdersDB.getOrderByRazorpayOrderId(order_id);
   if (!order) throw new AppError("Order not found", 404);
-  if (order.uid !== uid) throw new AppError("Unauthorized", 401);
+  if (order.status === "SUCCESS") {
+    return order;
+  }
 
   const generatedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-    .digest("hex");
-  if (generatedSignature !== razorpaySignature)
-    throw new AppError("Invalid payment", 400);
+    .createHmac("sha256", process.env.CASHFREE_SECRET_KEY)
+    .update(timestamp + rawBody)
+    .digest("base64");
 
-  await OrdersDB.updateOrder(razorpayOrderId, {
-    razorpayPaymentId,
-    status: "SUCCESS",
+  if (generatedSignature !== signature) {
+    throw new AppError("Invalid signature", 400);
+  }
+
+  await OrdersDB.updateOrder(order_id, {
+    status: payment_status,
   });
 
+  const uid = order.uid;
   const user = await AuthDB.getUser(uid);
   if (!user) throw new AppError("User not found", 404);
 
@@ -83,11 +136,13 @@ const verifyOrder = async ({
 
   await ReferralService.referralService({
     referredBy: user.referredBy,
-    orderId: order.id,
+    orderId: order_id,
     userId: uid,
   });
 
-  return { orderId: order.id, razorpayOrderId: order.razorpayOrderId };
+  console.log("Success");
+
+  return { orderId: order_id, paymentOrderId: order.paymentOrderId };
 };
 
 module.exports = { createOrder, verifyOrder };

@@ -11,7 +11,13 @@ const referralRoutes = require("./modules/referrals/referral.routes");
 
 const errorHandler = require("./middlewares/error.middleware");
 
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      req.rawBody = buf.toString();
+    },
+  }),
+);
 app.use(cors());
 
 app.use("/auth", authRoutes);
