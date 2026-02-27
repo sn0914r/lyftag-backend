@@ -67,7 +67,7 @@ const createOrder = async ({ uid, plan }) => {
   const data = await response.json();
   console.log(data);
   if (!response.ok) {
-    throw new AppError("Failed to create order", 500);
+    throw new AppError("Failed to create order", 500, "ORDER_CREATION_FAILED");
   }
 
   await OrdersDB.createOrder({
@@ -104,7 +104,7 @@ const verifyOrder = async ({
   rawBody,
 }) => {
   const order = await OrdersDB.getOrderByRazorpayOrderId(order_id);
-  if (!order) throw new AppError("Order not found", 404);
+  if (!order) throw new AppError("Order not found", 404, "ORDER_NOT_FOUND");
   if (order.status === "SUCCESS") {
     return order;
   }
@@ -115,7 +115,7 @@ const verifyOrder = async ({
     .digest("base64");
 
   if (generatedSignature !== signature) {
-    throw new AppError("Invalid signature", 400);
+    throw new AppError("Invalid signature", 400, "INVALID_SIGNATURE");
   }
 
   await OrdersDB.updateOrder(order_id, {
@@ -124,7 +124,7 @@ const verifyOrder = async ({
 
   const uid = order.uid;
   const user = await AuthDB.getUser(uid);
-  if (!user) throw new AppError("User not found", 404);
+  if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
   const isUpdated = await AuthDB.updateUser(uid, {
     planId: order.plan,
@@ -132,7 +132,7 @@ const verifyOrder = async ({
     planExpiryDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
   });
 
-  if (!isUpdated) throw new AppError("User not found", 404);
+  if (!isUpdated) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
   await ReferralService.referralService({
     referredBy: user.referredBy,

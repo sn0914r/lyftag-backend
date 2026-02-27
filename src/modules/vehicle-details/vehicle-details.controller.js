@@ -26,7 +26,11 @@ const addVehicleInfoController = async (req, res) => {
     },
   });
 
-  return res.status(201).json(vehicleDetails);
+  return res.status(201).json({
+    success: true,
+    message: "Vehicle info added successfully",
+    data: vehicleDetails,
+  });
 };
 
 /**
@@ -43,7 +47,11 @@ const getVehicleInfoController = async (req, res) => {
   const { uid } = req.user;
   const vehicleDetails = await VehicleDetailsService.getVehicleInfo(uid);
 
-  return res.status(200).json(vehicleDetails);
+  return res.status(200).json({
+    success: true,
+    message: "Vehicle info fetched successfully",
+    data: vehicleDetails,
+  });
 };
 
 /**
@@ -66,7 +74,11 @@ const updateVehicleInfoController = async (req, res) => {
     updates,
   });
 
-  return res.status(200).json(vehicleDetails);
+  return res.status(200).json({
+    success: true,
+    message: "Vehicle info updated successfully",
+    data: vehicleDetails,
+  });
 };
 
 module.exports = {

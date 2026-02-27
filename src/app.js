@@ -18,7 +18,12 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 app.use("/auth", authRoutes);
 app.use("/payments", paymentRoutes);

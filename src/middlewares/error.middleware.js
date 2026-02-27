@@ -4,20 +4,37 @@ const errorHandler = (err, _req, res, _next) => {
   const isProduction = process.env.NODE_ENV === "production";
   const status = err.statusCode || err.status || 500;
 
-  console.log(err);
+  console.error(err);
 
+  // Development: expose stack trace for debugging
   if (!isProduction) {
-    return res.status(status).json({
-      message: err.message,
+    const body = {
+      success: false,
+      message: err.message || "Something went wrong",
+      errorCode: err.errorCode || "INTERNAL_ERROR",
       stack: err.stack,
-    });
+    };
+    if (err.errors) body.errors = err.errors;
+    return res.status(status).json(body);
   }
 
+  // Production: AppError is a known, client-safe error
   if (err instanceof AppError) {
-    return res.status(status).json({ message: err.message, stack: err.stack });
+    const body = {
+      success: false,
+      message: err.message,
+      errorCode: err.errorCode,
+    };
+    if (err.errors) body.errors = err.errors;
+    return res.status(status).json(body);
   }
 
-  return res.status(500).json({ message: "Internal server error" });
+  // Production: unknown error — never expose internals
+  return res.status(500).json({
+    success: false,
+    message: "Internal server error",
+    errorCode: "INTERNAL_ERROR",
+  });
 };
 
 module.exports = errorHandler;

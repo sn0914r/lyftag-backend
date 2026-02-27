@@ -36,7 +36,8 @@ const createOrder = async ({
 const getOrderByRazorpayOrderId = async (orderId) => {
   const orderDocument = await db.collection(COLLECTION_NAME).doc(orderId).get();
 
-  if (!orderDocument.exists) throw new AppError("Order not found", 404);
+  if (!orderDocument.exists)
+    throw new AppError("Order not found", 404, "ORDER_NOT_FOUND");
 
   return { id: orderDocument.id, ...orderDocument.data() };
 };
@@ -48,7 +49,8 @@ const getOrderByRazorpayOrderId = async (orderId) => {
  */
 const updateOrder = async (orderId, { status }) => {
   const orderDocument = await db.collection(COLLECTION_NAME).doc(orderId).get();
-  if (!orderDocument.exists) throw new AppError("Order not found", 404);
+  if (!orderDocument.exists)
+    throw new AppError("Order not found", 404, "ORDER_NOT_FOUND");
 
   await orderDocument.ref.update({
     status,

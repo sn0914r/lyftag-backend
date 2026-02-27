@@ -33,10 +33,12 @@ const addVehicleInfo = async ({ uid, userDetails }) => {
  */
 const getVehicleInfo = async (uid) => {
   const isUserExists = await AuthDB.isUserExists(uid);
-  if (!isUserExists) throw new AppError("User not found", 404);
+  if (!isUserExists)
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
   const vehicleDetails = await VehicleDB.getVehicleInfo(uid);
-  if (!vehicleDetails) throw new AppError("Vehicle details not found", 404);
+  if (!vehicleDetails)
+    throw new AppError("Vehicle details not found", 404, "VEHICLE_NOT_FOUND");
 
   return vehicleDetails;
 };
@@ -47,10 +49,12 @@ const getVehicleInfo = async (uid) => {
  * @returns {Promise<object>} updated vehicle details
  */
 const updateVehicleInfo = async ({ uid, updates }) => {
-  if (!AuthDB.isUserExists(uid)) throw new AppError("User not found", 404);
+  if (!AuthDB.isUserExists(uid))
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
   const vehicleDetails = await VehicleDB.getVehicleInfo(uid);
-  if (!vehicleDetails) throw new AppError("Vehicle details not found", 404);
+  if (!vehicleDetails)
+    throw new AppError("Vehicle details not found", 404, "VEHICLE_NOT_FOUND");
 
   await VehicleDB.updateUserProfile({ uid, updates });
 

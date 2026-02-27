@@ -6,7 +6,8 @@ const VehicleDB = require("../vehicle-details/vehile-details.db");
  */
 const getVehicleInfo = async (publicId) => {
   const vehicleDetails = await VehicleDB.getVehicleInfoByQRId(publicId);
-  if (!vehicleDetails) throw new AppError("Vehicle details not found", 404);
+  if (!vehicleDetails)
+    throw new AppError("Vehicle details not found", 404, "VEHICLE_NOT_FOUND");
   const { createdAt, updatedAt, id, qrId, ...rest } = vehicleDetails;
   return { ...rest };
 };

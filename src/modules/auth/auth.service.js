@@ -14,7 +14,8 @@ const Utils = require("./auth.utils");
  * @returns {object} user
  */
 const syncUser = async ({ uid, email, name, referredBy }) => {
-  if (await authDB.isUserExists(uid)) throw new AppError("User already exists", 400);
+  if (await authDB.isUserExists(uid))
+    throw new AppError("User already exists", 400, "USER_ALREADY_EXISTS");
 
   const referralCode = Utils.generateReferralCode();
 
@@ -27,7 +28,7 @@ const syncUser = async ({ uid, email, name, referredBy }) => {
   });
 
   const user = authDB.getUser(uid);
-  if (!user) throw new AppError("User not found", 404);
+  if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
 
   return user;
 };

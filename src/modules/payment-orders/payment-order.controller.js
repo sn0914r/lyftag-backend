@@ -17,7 +17,11 @@ const createOrderController = async (req, res) => {
 
   const order = await PaymentService.createOrder({ uid, plan });
 
-  res.status(200).json(order);
+  res.status(200).json({
+    success: true,
+    message: "Order created successfully",
+    data: order,
+  });
 };
 
 /**
@@ -49,7 +53,11 @@ const verifyOrderController = async (req, res) => {
     rawBody: req.rawBody,
   });
 
-  res.status(200).json(order);
+  res.status(200).json({
+    success: true,
+    message: "Order verified successfully",
+    data: order,
+  });
 };
 
 module.exports = {

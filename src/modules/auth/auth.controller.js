@@ -20,7 +20,11 @@ const syncUserController = async (req, res) => {
     referredBy,
   });
 
-  res.status(200).json(user);
+  res.status(200).json({
+    success: true,
+    message: "User synced successfully",
+    data: user,
+  });
 };
 
 module.exports = { syncUserController };
