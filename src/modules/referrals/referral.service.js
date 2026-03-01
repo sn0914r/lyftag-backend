@@ -38,9 +38,7 @@ const referralService = async ({ referredBy, orderId, userId }) => {
 const getReferralInfoService = async (uid) => {
   const user = await AuthDB.getUser(uid);
   if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
-  console.log(user, "user");
   const referralCode = user.referralCode;
-  console.log("referralCode", referralCode);
   if (!referralCode) return { referralDetails: {}, referralTransactions: [] };
 
   const referralDetails =

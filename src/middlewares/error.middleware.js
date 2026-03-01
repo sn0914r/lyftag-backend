@@ -6,7 +6,6 @@ const errorHandler = (err, _req, res, _next) => {
 
   console.error(err);
 
-  // Development: expose stack trace for debugging
   if (!isProduction) {
     const body = {
       success: false,
@@ -14,11 +13,11 @@ const errorHandler = (err, _req, res, _next) => {
       errorCode: err.errorCode || "INTERNAL_ERROR",
       stack: err.stack,
     };
+    
     if (err.errors) body.errors = err.errors;
     return res.status(status).json(body);
   }
 
-  // Production: AppError is a known, client-safe error
   if (err instanceof AppError) {
     const body = {
       success: false,
@@ -29,7 +28,6 @@ const errorHandler = (err, _req, res, _next) => {
     return res.status(status).json(body);
   }
 
-  // Production: unknown error — never expose internals
   return res.status(500).json({
     success: false,
     message: "Internal server error",

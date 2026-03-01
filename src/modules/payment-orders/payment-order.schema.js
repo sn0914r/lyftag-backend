@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 const PlanIdSchema = Joi.object({
-  plan: Joi.string().required().valid("BASIC", "PREMIUM"),
+  plan: Joi.string().required().valid("BASIC", "PREMIUM", "TEST"),
 });
 
 const PaymentVerificationDetailsSchema = Joi.object({

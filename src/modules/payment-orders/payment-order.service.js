@@ -65,7 +65,6 @@ const createOrder = async ({ uid, plan }) => {
     body,
   });
   const data = await response.json();
-  console.log(data);
   if (!response.ok) {
     throw new AppError("Failed to create order", 500, "ORDER_CREATION_FAILED");
   }
@@ -139,8 +138,6 @@ const verifyOrder = async ({
     orderId: order_id,
     userId: uid,
   });
-
-  console.log("Success");
 
   return { orderId: order_id, paymentOrderId: order.paymentOrderId };
 };

@@ -9,10 +9,6 @@ const validateBody = (schema) => (req, res, next) => {
     appError.errors = errors;
     throw appError;
   }
-
-  if (process.env.NODE_ENV !== "production") {
-    console.log("req body: ", value);
-  }
   
   req.body = value;
   next();

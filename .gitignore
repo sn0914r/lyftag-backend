@@ -4,3 +4,5 @@ log.md
 .DS_Store
 docs
 ai
+models
+mongoDB.config.js

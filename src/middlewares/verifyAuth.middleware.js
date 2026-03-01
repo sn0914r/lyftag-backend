@@ -9,6 +9,7 @@ const verifyAuth = async (req, res, next) => {
 
   const decodedToken = await auth.verifyIdToken(token);
   req.user = decodedToken;
+
   next();
 };
 
