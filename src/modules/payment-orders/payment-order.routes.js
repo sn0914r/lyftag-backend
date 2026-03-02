@@ -11,11 +11,6 @@ router.post(
   validateBody(PaymentSchema.PlanIdSchema),
   PaymentController.createOrderController,
 );
-router.post(
-  "/verify-order",
-  verifyAuth,
-  validateBody(PaymentSchema.PaymentVerificationDetailsSchema),
-  PaymentController.verifyOrderController,
-);
+router.post("/verify-order", PaymentController.verifyOrderController);
 
 module.exports = router;

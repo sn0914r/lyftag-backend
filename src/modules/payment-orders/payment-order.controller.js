@@ -36,28 +36,30 @@ const createOrderController = async (req, res) => {
  * @access Private
  */
 const verifyOrderController = async (req, res) => {
-  const signature = req.headers["x-webhook-signature"];
-  const timestamp = req.headers["x-webhook-timestamp"];
-  const {
-    data: {
-      order: { order_id },
-      payment: { payment_status },
-    },
-  } = req.body;
+  console.log("++++++++++++++ RES +++++++++++++");
+  return res.status(200).json({ success: true, message: "Order verified successfully" });
+  // const signature = req.headers["x-webhook-signature"];
+  // const timestamp = req.headers["x-webhook-timestamp"];
+  // const {
+  //   data: {
+  //     order: { order_id },
+  //     payment: { payment_status },
+  //   },
+  // } = req.body;
 
-  const order = await PaymentService.verifyOrder({
-    order_id,
-    signature,
-    timestamp,
-    payment_status,
-    rawBody: req.rawBody,
-  });
+  // const order = await PaymentService.verifyOrder({
+  //   order_id,
+  //   signature,
+  //   timestamp,
+  //   payment_status,
+  //   rawBody: req.rawBody,
+  // });
 
-  res.status(200).json({
-    success: true,
-    message: "Order verified successfully",
-    data: order,
-  });
+  // return res.status(200).json({
+  //   success: true,
+  //   message: "Order verified successfully",
+  //   data: order,
+  // });
 };
 
 module.exports = {

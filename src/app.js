@@ -11,6 +11,11 @@ const referralRoutes = require("./modules/referrals/referral.routes");
 
 const errorHandler = require("./middlewares/error.middleware");
 
+app.use((req, res, next) => {
+  console.log("req", req.headers);
+  next();
+});
+
 app.use(
   express.json({
     verify: (req, _res, buf) => {
